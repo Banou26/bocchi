@@ -45,7 +45,12 @@ const makeFakePackage = () => {
   })
 }
 
-const { client } = makeBocchi({
+const firstPackages =
+  Array(10)
+    .fill(0)
+    .map(makeFakePackage)
+
+const { client, cache } = makeBocchi({
   typeDefs,
   resolvers: {
     Query: {
@@ -60,12 +65,45 @@ const { client } = makeBocchi({
         abortSignal.addEventListener('abort', (...args) => {
           console.log('aborted', ...args)
         })
+
         await new Promise(resolve => setTimeout(resolve, 1000))
-        return (
+
+        const secondPackages =
           Array(10)
             .fill(0)
             .map(makeFakePackage)
-        )
+
+        cache.writeQuery({
+          query: GET_PACKAGES,
+          data: {
+            packages: [...firstPackages, ...secondPackages]
+          }
+        })
+        console.log('adding to cache')
+
+        await new Promise(resolve => setTimeout(resolve, 1000))
+
+        cache.writeQuery({
+          query: GET_PACKAGES,
+          data: {
+            packages: [
+              ...firstPackages,
+              ...secondPackages,
+              ...Array(10)
+                .fill(0)
+                .map(makeFakePackage)
+            ]
+          }
+        })
+
+        console.log('returning')
+        return [
+          ...firstPackages,
+          ...secondPackages,
+          ...Array(10)
+            .fill(0)
+            .map(makeFakePackage)
+        ]
       }
     }
   }
@@ -97,8 +135,15 @@ const GET_PACKAGES = gql(`#gql
   }
 `)
 
+cache.writeQuery({
+  query: GET_PACKAGES,
+  data: {
+    packages: firstPackages
+  }
+})
+
 const Foo = () => {
-  const { data, error } = useQuery(GET_PACKAGES)
+  const { data, error } = useQuery(GET_PACKAGES, { fetchPolicy: 'cache-and-network' })
   const packages = data?.packages
   if (error) console.error(error)
   console.log('packages', packages)
@@ -119,11 +164,11 @@ const Foo = () => {
 const Mount = () => {
   const [foo, setFoo] = useState(true)
 
-  useEffect(() => {
-    setTimeout(() => {
-      setFoo(false)
-    }, 500)
-  }, [])
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setFoo(false)
+  //   }, 500)
+  // }, [])
 
   return (
     <div>

@@ -229,7 +229,8 @@ const makeBocchi = <TContext extends BaseContext>({ typeDefs, resolvers }: MakeB
   })
   return {
     server,
-    client
+    client,
+    cache: apolloCache
   }
 }
 
