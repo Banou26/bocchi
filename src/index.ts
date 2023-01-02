@@ -63,7 +63,7 @@ export const makeBocchi = <TContext extends BaseContext>({ typeDefs, resolvers }
 
 export default makeBocchi
 
-export const useBocchiQuery = <T, T2 = OperationVariables>(query: DocumentNode | TypedDocumentNode<T, T2>, options?: QueryHookOptions<T, T2>) => {
+const useBocchiQuery = <T, T2 = OperationVariables>(query: DocumentNode | TypedDocumentNode<T, T2>, options?: QueryHookOptions<T, T2>) => {
   const [defaultAbort] = useState(new AbortController())
   const result = useQuery(
     query,
@@ -87,4 +87,8 @@ export const useBocchiQuery = <T, T2 = OperationVariables>(query: DocumentNode |
     }
   }, [])
   return result
+}
+
+export {
+  useBocchiQuery as useQuery
 }
