@@ -3,8 +3,8 @@ import gql from 'graphql-tag'
 
 import { faker } from '@faker-js/faker'
 
-import makeBocchi from './index'
-import { ApolloProvider, useQuery } from '@apollo/client'
+import makeBocchi, { useBocchiQuery } from './index'
+import { ApolloProvider, DocumentNode, OperationVariables, QueryHookOptions, TypedDocumentNode, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
 const typeDefs = gql(`#gql
@@ -143,10 +143,10 @@ cache.writeQuery({
 })
 
 const Foo = () => {
-  const { data, error } = useQuery(GET_PACKAGES, { fetchPolicy: 'cache-and-network' })
+  const { data, error, loading } = useBocchiQuery(GET_PACKAGES)
   const packages = data?.packages
   if (error) console.error(error)
-  console.log('packages', packages)
+  console.log('packages', loading, packages)
   return (
     <div>
       foo
@@ -164,11 +164,12 @@ const Foo = () => {
 const Mount = () => {
   const [foo, setFoo] = useState(true)
 
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setFoo(false)
-  //   }, 500)
-  // }, [])
+  console.log('foo', foo)
+  useEffect(() => {
+    setTimeout(() => {
+      setFoo(false)
+    }, 1500)
+  }, [])
 
   return (
     <div>
