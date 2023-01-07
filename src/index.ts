@@ -9,8 +9,7 @@ type MakeBocchiOptions<TContext extends BaseContext> =
   Required<
     Pick<
       ApolloServerOptions<TContext>,
-      'typeDefs' |
-      'resolvers'
+      'typeDefs' | 'resolvers'
     >
   >
 
@@ -63,7 +62,7 @@ export const makeBocchi = <TContext extends BaseContext>({ typeDefs, resolvers }
 
 export default makeBocchi
 
-const useBocchiQuery = <T, T2 = OperationVariables>(query: DocumentNode | TypedDocumentNode<T, T2>, options?: QueryHookOptions<T, T2>) => {
+export const useBocchiQuery = <T, T2 = OperationVariables>(query: DocumentNode | TypedDocumentNode<T, T2>, options?: QueryHookOptions<T, T2>) => {
   const [defaultAbort] = useState(new AbortController())
   const result = useQuery(
     query,
